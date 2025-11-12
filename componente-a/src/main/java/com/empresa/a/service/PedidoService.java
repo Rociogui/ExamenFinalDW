@@ -5,6 +5,7 @@ import com.empresa.a.repository.PedidoRepository;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
+import com.empresa.c.Utils;
 
 @Service
 public class PedidoService {
@@ -21,8 +22,12 @@ public class PedidoService {
         return pedidoRepository.findById(id);
     }
     public Pedido guardar(Pedido pedido) {
-         return pedidoRepository.save(pedido); 
-         }
+        if (pedido.getTotal() == null) {
+            pedido.setTotal(0.0);
+        }
+                pedido.setDescripcion(Utils.generarCodigoUnico("PEDIDO"));
+                        return pedidoRepository.save(pedido);
+    }
     public void eliminar(Long id) {
          pedidoRepository.deleteById(id); 
          }
