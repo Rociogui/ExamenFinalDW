@@ -15,6 +15,32 @@ public class MetodosCompartidos {
         return precios.stream().mapToDouble(Double::doubleValue).sum();
     }
 
+    // Método para calcular total con IVA (21% por defecto)
+    public static double calcularTotalConIVA(double subtotal) {
+        return calcularTotalConIVA(subtotal, 0.21);
+    }
+
+    // Método para calcular total con IVA personalizado
+    public static double calcularTotalConIVA(double subtotal, double tasaIVA) {
+        return subtotal * (1 + tasaIVA);
+    }
+
+    // Método para aplicar descuento porcentual
+    public static double aplicarDescuento(double total, double porcentajeDescuento) {
+        return total * (1 - (porcentajeDescuento / 100.0));
+    }
+
+    // Método para calcular total con IVA y descuento
+    public static double calcularTotalConIVAyDescuento(double subtotal, double porcentajeDescuento) {
+        return calcularTotalConIVAyDescuento(subtotal, porcentajeDescuento, 0.21);
+    }
+
+    // Método para calcular total con IVA personalizado y descuento
+    public static double calcularTotalConIVAyDescuento(double subtotal, double porcentajeDescuento, double tasaIVA) {
+        double conDescuento = aplicarDescuento(subtotal, porcentajeDescuento);
+        return calcularTotalConIVA(conDescuento, tasaIVA);
+    }
+
     // Ejemplo de integración circular: invoca endpoint de A o B
     public static void notificarRegistro(String urlEndpoint) {
         try {
