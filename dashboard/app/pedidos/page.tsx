@@ -98,10 +98,20 @@ export default function PedidosPage() {
         return;
       }
 
+      // Validar que haya al menos un producto seleccionado
+      const productosValidos = formData.productos.filter((p) => p.nombre && p.precio > 0 && p.cantidad > 0);
+      
+      if (productosValidos.length === 0) {
+        setError("Debe seleccionar al menos un producto con cantidad mayor a 0");
+        return;
+      }
+
       const payload = {
         clienteId: formData.clienteId,
-        productos: formData.productos.filter((p) => p.nombre && p.precio > 0),
+        productos: productosValidos,
       };
+
+      console.log("Enviando payload:", JSON.stringify(payload, null, 2));
 
       const response = await fetchAPI(`${API_BASE_A}/pedidos`, {
         method: "POST",
@@ -113,8 +123,9 @@ export default function PedidosPage() {
         productos: [{ nombre: "", precio: 0, cantidad: 1 }],
       });
       setShowForm(false);
+      setError("");
     } catch (err) {
-      setError("Error al crear pedido");
+      setError("Error al crear pedido: " + (err instanceof Error ? err.message : "Error desconocido"));
       console.error(err);
     }
   };

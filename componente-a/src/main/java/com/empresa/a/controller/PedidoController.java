@@ -37,43 +37,49 @@ public class PedidoController {
 
     @PostMapping
     public Pedido registrarPedido(@RequestBody Map<String, Object> data) {
-        Pedido pedido = new Pedido();
-        
-        // Obtener cliente por ID
-        Long clienteId = ((Number) data.get("clienteId")).longValue();
-        Cliente cliente = clienteService.obtenerPorId(clienteId)
-                .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
-        pedido.setCliente(cliente);
-        
-        // Asignar productos
-        List<Map<String, Object>> productosData = (List<Map<String, Object>>) data.get("productos");
-        if (productosData != null && !productosData.isEmpty()) {
-            List<Producto> productos = productosData.stream()
-                    .map(p -> new Producto(
-                            (String) p.get("nombre"),
-                            ((Number) p.get("precio")).doubleValue()
-                    ))
-                    .toList();
-            pedido.setProductos(productos);
+        try {
+            Pedido pedido = new Pedido();
             
-            // Calcular total: suma de (precio * cantidad)
-            double total = productosData.stream()
-                    .mapToDouble(p -> {
-                        double precio = ((Number) p.get("precio")).doubleValue();
-                        double cantidad = ((Number) p.getOrDefault("cantidad", 1)).doubleValue();
-                        return precio * cantidad;
-                    })
-                    .sum();
-            pedido.setTotal(total);
+            // Obtener cliente por ID
+            Long clienteId = ((Number) data.get("clienteId")).longValue();
+            Cliente cliente = clienteService.obtenerPorId(clienteId)
+                    .orElseThrow(() -> new RuntimeException("Cliente no encontrado con ID: " + clienteId));
+            pedido.setCliente(cliente);
+            
+            // Asignar productos
+            List<Map<String, Object>> productosData = (List<Map<String, Object>>) data.get("productos");
+            if (productosData != null && !productosData.isEmpty()) {
+                List<Producto> productos = productosData.stream()
+                        .map(p -> new Producto(
+                                (String) p.get("nombre"),
+                                ((Number) p.get("precio")).doubleValue()
+                        ))
+                        .toList();
+                pedido.setProductos(productos);
+                
+                // Calcular total: suma de (precio * cantidad)
+                double total = productosData.stream()
+                        .mapToDouble(p -> {
+                            double precio = ((Number) p.get("precio")).doubleValue();
+                            double cantidad = ((Number) p.getOrDefault("cantidad", 1)).doubleValue();
+                            return precio * cantidad;
+                        })
+                        .sum();
+                pedido.setTotal(total);
+            } else {
+                pedido.setTotal(0.0);
+            }
+            
+            // Generar código único
+            String codigo = MetodosCompartidos.generarCodigoUnico("PEDIDO");
+            pedido.setDescripcion("Pedido generado con código: " + codigo);
+            
+            Pedido nuevoPedido = pedidoService.guardar(pedido);
+            MetodosCompartidos.notificarRegistro("http://localhost:8081/api/facturas");
+            return nuevoPedido;
+        } catch (Exception e) {
+            throw new RuntimeException("Error al crear pedido: " + e.getMessage(), e);
         }
-        
-        // Generar código único
-        String codigo = MetodosCompartidos.generarCodigoUnico("PEDIDO");
-        pedido.setDescripcion("Pedido generado con código: " + codigo);
-        
-        Pedido nuevoPedido = pedidoService.guardar(pedido);
-        MetodosCompartidos.notificarRegistro("http://localhost:8081/api/facturas");
-        return nuevoPedido;
     }
 
     @DeleteMapping("/{id}")
