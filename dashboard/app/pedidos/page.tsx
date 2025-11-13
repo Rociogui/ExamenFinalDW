@@ -104,7 +104,7 @@ export default function PedidosPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-gray-800">Gestión de Pedidos</h1>
+        <h1 className="text-3xl font-bold text-gray-900">Gestión de Pedidos</h1>
         <button
           onClick={() => setShowForm(!showForm)}
           className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition font-medium"

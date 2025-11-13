@@ -55,7 +55,7 @@ export default function ProveedoresPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-gray-800">Gestión de Proveedores</h1>
+        <h1 className="text-3xl font-bold text-gray-900">Gestión de Proveedores</h1>
         <button
           onClick={() => setShowForm(!showForm)}
           className="bg-orange-600 text-white px-6 py-2 rounded-lg hover:bg-orange-700 transition font-medium"

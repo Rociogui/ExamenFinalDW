@@ -104,7 +104,7 @@ export default function FacturasPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-gray-800">Gestión de Facturas</h1>
+        <h1 className="text-3xl font-bold text-gray-900">Gestión de Facturas</h1>
         <button
           onClick={() => setShowForm(!showForm)}
           className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition font-medium"
