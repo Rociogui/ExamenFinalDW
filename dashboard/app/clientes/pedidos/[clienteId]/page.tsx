@@ -34,6 +34,7 @@ export default function PedidosClientePage() {
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [clienteIdFormateado, setClienteIdFormateado] = useState<string>("");
 
   useEffect(() => {
     cargarDatos();
@@ -46,6 +47,12 @@ export default function PedidosClientePage() {
       // Cargar información del cliente
       const clienteData = await fetchAPI(`${API_BASE_A}/clientes/${clienteId}`);
       setCliente(clienteData);
+
+      // Cargar todos los clientes para calcular el índice formateado
+      const todosLosClientes = await fetchAPI(`${API_BASE_A}/clientes`);
+      const clientesOrdenados = todosLosClientes.sort((a: Cliente, b: Cliente) => a.id - b.id);
+      const indice = clientesOrdenados.findIndex((c: Cliente) => c.id === parseInt(clienteId));
+      setClienteIdFormateado(String(indice + 1).padStart(3, "0"));
 
       // Cargar todos los pedidos
       const pedidosData = await fetchAPI(`${API_BASE_A}/pedidos`);
@@ -99,7 +106,7 @@ export default function PedidosClientePage() {
           </div>
           <div className="bg-blue-700 rounded-lg p-4">
             <p className="text-blue-100 text-sm">Cliente ID</p>
-            <p className="text-3xl font-bold">#{cliente?.id}</p>
+            <p className="text-3xl font-bold">#{clienteIdFormateado}</p>
           </div>
         </div>
       </div>
