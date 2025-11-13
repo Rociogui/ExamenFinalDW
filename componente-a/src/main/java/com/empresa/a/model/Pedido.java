@@ -1,6 +1,7 @@
 package com.empresa.a.model;
 
 import jakarta.persistence.*;
+import java.util.List;
 
 @Entity
 public class Pedido {
@@ -13,7 +14,12 @@ public class Pedido {
     @ManyToOne
     @JoinColumn(name = "cliente_id")
     private Cliente cliente;
-public Pedido() {}
+
+    @ElementCollection
+    @CollectionTable(name = "pedido_productos", joinColumns = @JoinColumn(name = "pedido_id"))
+    private List<Producto> productos;
+
+    public Pedido() {}
 
     // Constructor con parámetros (opcional)
     public Pedido(String descripcion, Double total, Cliente cliente) {
@@ -53,6 +59,14 @@ public Pedido() {}
 
     public void setCliente(Cliente cliente) {
         this.cliente = cliente;
+    }
+
+    public List<Producto> getProductos() {
+        return productos;
+    }
+
+    public void setProductos(List<Producto> productos) {
+        this.productos = productos;
     }
 }
 
