@@ -1,0 +1,172 @@
+openapi: 3.0.3
+info:
+  title: API Componente B - Facturas y Proveedores
+  version: 1.0.0
+  description: API REST para gestión de facturas y proveedores en la empresa de logística.
+servers:
+  - url: http://localhost:8081
+paths:
+  /api/proveedores:
+    get:
+      summary: Listar todos los proveedores
+      responses:
+        '200':
+          description: Lista de proveedores obtenida correctamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Proveedor'
+    post:
+      summary: Registrar un proveedor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProveedorInput'
+      responses:
+        '201':
+          description: Proveedor creado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Proveedor'
+        '400':
+          description: Datos inválidos
+
+  /api/proveedores/{id}:
+    get:
+      summary: Obtener proveedor por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Proveedor encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Proveedor'
+        '404':
+          description: Proveedor no encontrado
+
+  /api/facturas:
+    get:
+      summary: Listar todas las facturas
+      responses:
+        '200':
+          description: Lista de facturas obtenida correctamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Factura'
+    post:
+      summary: Registrar una nueva factura
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FacturaInput'
+      responses:
+        '201':
+          description: Factura registrada correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Factura'
+        '400':
+          description: Error de validación
+
+  /api/facturas/{id}:
+    get:
+      summary: Obtener factura por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Factura encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Factura'
+        '404':
+          description: Factura no encontrada
+
+components:
+  schemas:
+    Proveedor:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        nombre:
+          type: string
+          example: ACME S.A.
+        correo:
+          type: string
+          format: email
+          example: ventas@acme.com
+
+    ProveedorInput:
+      type: object
+      required:
+        - nombre
+        - correo
+      properties:
+        nombre:
+          type: string
+        correo:
+          type: string
+          format: email
+
+    PedidoReferencia:
+      type: object
+      properties:
+        pedidoId:
+          type: integer
+        total:
+          type: number
+          format: double
+
+    Factura:
+      type: object
+      properties:
+        id:
+          type: integer
+        numero:
+          type: string
+        proveedorId:
+          type: integer
+        pedidos:
+          type: array
+          items:
+            $ref: '#/components/schemas/PedidoReferencia'
+        totalFactura:
+          type: number
+          format: double
+
+    FacturaInput:
+      type: object
+      required:
+        - proveedorId
+        - pedidos
+      properties:
+        proveedorId:
+          type: integer
+        pedidos:
+          type: array
+          items:
+            $ref: '#/components/schemas/PedidoReferencia'
