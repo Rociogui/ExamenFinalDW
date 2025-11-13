@@ -14,6 +14,7 @@ interface Cliente {
 interface Producto {
   nombre: string;
   precio: number;
+  cantidad: number;
 }
 
 interface Pedido {
@@ -35,7 +36,7 @@ export default function PedidosPage() {
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     clienteId: clienteIdParam ? parseInt(clienteIdParam) : 0,
-    productos: [{ nombre: "", precio: 0 }],
+    productos: [{ nombre: "", precio: 0, cantidad: 1 }],
   });
 
   useEffect(() => {
@@ -67,6 +68,7 @@ export default function PedidosPage() {
       newProductos[index] = {
         nombre: value,
         precio: productoSeleccionado?.precio || 0,
+        cantidad: newProductos[index].cantidad || 1,
       };
     } else {
       newProductos[index] = { ...newProductos[index], [field]: value };
@@ -77,7 +79,7 @@ export default function PedidosPage() {
   const addProducto = () => {
     setFormData({
       ...formData,
-      productos: [...formData.productos, { nombre: "", precio: 0 }],
+      productos: [...formData.productos, { nombre: "", precio: 0, cantidad: 1 }],
     });
   };
 
@@ -108,7 +110,7 @@ export default function PedidosPage() {
       setPedidos([...pedidos, response]);
       setFormData({
         clienteId: clienteIdParam ? parseInt(clienteIdParam) : 0,
-        productos: [{ nombre: "", precio: 0 }],
+        productos: [{ nombre: "", precio: 0, cantidad: 1 }],
       });
       setShowForm(false);
     } catch (err) {
@@ -118,7 +120,7 @@ export default function PedidosPage() {
   };
 
   const calcularTotal = (productos: Producto[]) => {
-    return productos.reduce((sum, p) => sum + (p.precio || 0), 0);
+    return productos.reduce((sum, p) => sum + (p.precio * p.cantidad || 0), 0);
   };
 
   return (
@@ -164,30 +166,49 @@ export default function PedidosPage() {
               <label className="block text-sm font-medium text-gray-700 mb-2">Productos del Catálogo</label>
               <div className="space-y-3">
                 {formData.productos.map((producto, index) => (
-                  <div key={index} className="flex gap-2">
-                    <select
-                      value={producto.nombre}
-                      onChange={(e) => handleProductoChange(index, "nombre", e.target.value)}
-                      className="flex-1 px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900 bg-white"
-                    >
-                      <option value="">Seleccionar producto...</option>
-                      {PRODUCTOS_CATALOGO.map((prod) => (
-                        <option key={prod.id} value={prod.nombre}>
-                          {prod.nombre} - Q.{prod.precio.toFixed(2)}
-                        </option>
-                      ))}
-                    </select>
-                    <input
-                      type="number"
-                      value={producto.precio}
-                      disabled
-                      className="w-32 px-4 py-2 border-2 border-gray-300 rounded-lg text-gray-900 bg-gray-100 cursor-not-allowed"
-                    />
+                  <div key={index} className="flex gap-2 items-end">
+                    <div className="flex-1">
+                      <label className="block text-xs text-gray-600 mb-1">Producto</label>
+                      <select
+                        value={producto.nombre}
+                        onChange={(e) => handleProductoChange(index, "nombre", e.target.value)}
+                        className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900 bg-white"
+                      >
+                        <option value="">Seleccionar producto...</option>
+                        {PRODUCTOS_CATALOGO.map((prod) => (
+                          <option key={prod.id} value={prod.nombre}>
+                            {prod.nombre} - Q.{prod.precio.toFixed(2)}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="w-32">
+                      <label className="block text-xs text-gray-600 mb-1">Precio Unidad</label>
+                      <div className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg text-gray-900 bg-gray-100 text-sm font-medium">
+                        Q.{producto.precio.toFixed(2)}
+                      </div>
+                    </div>
+                    <div className="w-24">
+                      <label className="block text-xs text-gray-600 mb-1">Cantidad</label>
+                      <input
+                        type="number"
+                        min="1"
+                        value={producto.cantidad}
+                        onChange={(e) => handleProductoChange(index, "cantidad", Math.max(1, parseInt(e.target.value) || 1))}
+                        className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900 bg-white text-sm"
+                      />
+                    </div>
+                    <div className="w-28">
+                      <label className="block text-xs text-gray-600 mb-1">Subtotal</label>
+                      <div className="px-4 py-2 border-2 border-gray-300 rounded-lg bg-blue-50 text-blue-700 font-semibold text-sm">
+                        Q.{(producto.precio * producto.cantidad).toFixed(2)}
+                      </div>
+                    </div>
                     {formData.productos.length > 1 && (
                       <button
                         type="button"
                         onClick={() => removeProducto(index)}
-                        className="bg-red-500 text-white px-3 py-2 rounded hover:bg-red-600"
+                        className="bg-red-500 text-white px-3 py-2 rounded hover:bg-red-600 h-10"
                       >
                         ✕
                       </button>
