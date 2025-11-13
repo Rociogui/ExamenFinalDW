@@ -24,7 +24,7 @@ public class FacturaService {
     }
 
     public Factura guardar(Factura factura) {
-        if (factura.getTotal() == null) factura.setTotal(0.0);
+        if (factura.getTotalFactura() == null) factura.setTotalFactura(0.0);
         factura.setNumero(Utils.generarCodigoUnico("FACT"));
         return facturaRepository.save(factura);
     }

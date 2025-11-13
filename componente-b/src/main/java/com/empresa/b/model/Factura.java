@@ -12,7 +12,7 @@ public class Factura {
     private Long id;
 
     private String numero;
-    private Double total;
+    private Double totalFactura;
 
     @ManyToOne
     @JoinColumn(name = "proveedor_id")
