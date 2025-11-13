@@ -4,9 +4,11 @@ const API_BASE_B = process.env.NEXT_PUBLIC_API_B || "http://localhost:8081/api";
 
 export { API_BASE_A, API_BASE_B };
 
-// Helper function to make API calls
+// Helper function to make API calls with better error handling
 export async function fetchAPI(url: string, options?: RequestInit) {
   try {
+    console.log(`[API] Llamando a: ${url} con método: ${options?.method || "GET"}`);
+    
     const response = await fetch(url, {
       ...options,
       headers: {
@@ -15,13 +17,19 @@ export async function fetchAPI(url: string, options?: RequestInit) {
       },
     });
 
+    console.log(`[API] Response status: ${response.status}`);
+
     if (!response.ok) {
-      throw new Error(`API Error: ${response.status}`);
+      const errorText = await response.text();
+      console.error(`[API] Error response body:`, errorText);
+      throw new Error(`API Error ${response.status}: ${errorText}`);
     }
 
-    return await response.json();
+    const data = await response.json();
+    console.log(`[API] Response data:`, data);
+    return data;
   } catch (error) {
-    console.error("Fetch error:", error);
+    console.error("[API] Fetch error:", error);
     throw error;
   }
 }
