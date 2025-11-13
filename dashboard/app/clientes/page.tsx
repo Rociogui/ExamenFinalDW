@@ -15,6 +15,7 @@ export default function ClientesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
   const [formData, setFormData] = useState({ nombre: "", correo: "" });
 
   useEffect(() => {
@@ -35,18 +36,54 @@ export default function ClientesPage() {
     }
   };
 
+  const abrirEdicion = (cliente: Cliente) => {
+    setEditingId(cliente.id);
+    setFormData({ nombre: cliente.nombre, correo: cliente.correo });
+    setShowForm(true);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetchAPI(`${API_BASE_A}/clientes`, {
-        method: "POST",
-        body: JSON.stringify(formData),
-      });
-      setClientes([...clientes, response]);
+      if (editingId) {
+        // Editar cliente existente
+        const response = await fetchAPI(`${API_BASE_A}/clientes/${editingId}`, {
+          method: "PUT",
+          body: JSON.stringify(formData),
+        });
+        setClientes(
+          clientes.map((c) => (c.id === editingId ? response : c))
+        );
+        setEditingId(null);
+      } else {
+        // Crear nuevo cliente
+        const response = await fetchAPI(`${API_BASE_A}/clientes`, {
+          method: "POST",
+          body: JSON.stringify(formData),
+        });
+        setClientes([...clientes, response]);
+      }
       setFormData({ nombre: "", correo: "" });
       setShowForm(false);
+      setError("");
     } catch (err) {
-      setError("Error al crear cliente");
+      setError("Error al guardar cliente");
+      console.error(err);
+    }
+  };
+
+  const eliminarCliente = async (id: number) => {
+    if (!window.confirm("¿Estás seguro de que deseas eliminar este cliente?")) {
+      return;
+    }
+    try {
+      await fetchAPI(`${API_BASE_A}/clientes/${id}`, {
+        method: "DELETE",
+      });
+      setClientes(clientes.filter((c) => c.id !== id));
+      setError("");
+    } catch (err) {
+      setError("Error al eliminar cliente");
       console.error(err);
     }
   };
@@ -56,7 +93,11 @@ export default function ClientesPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-gray-900">Gestión de Clientes</h1>
         <button
-          onClick={() => setShowForm(!showForm)}
+          onClick={() => {
+            setEditingId(null);
+            setFormData({ nombre: "", correo: "" });
+            setShowForm(!showForm);
+          }}
           className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition font-medium"
         >
           + Nuevo Cliente
@@ -71,7 +112,9 @@ export default function ClientesPage() {
 
       {showForm && (
         <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">Crear Nuevo Cliente</h2>
+          <h2 className="text-xl font-bold text-gray-800 mb-4">
+            {editingId ? "Editar Cliente" : "Crear Nuevo Cliente"}
+          </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
@@ -100,11 +143,15 @@ export default function ClientesPage() {
                 type="submit"
                 className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition font-medium"
               >
-                Guardar
+                {editingId ? "Actualizar" : "Guardar"}
               </button>
               <button
                 type="button"
-                onClick={() => setShowForm(false)}
+                onClick={() => {
+                  setShowForm(false);
+                  setEditingId(null);
+                  setFormData({ nombre: "", correo: "" });
+                }}
                 className="bg-gray-400 text-white px-6 py-2 rounded-lg hover:bg-gray-500 transition font-medium"
               >
                 Cancelar
@@ -126,7 +173,7 @@ export default function ClientesPage() {
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">ID</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Nombre</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Correo</th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Acciones</th>
+                <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -143,12 +190,28 @@ export default function ClientesPage() {
                     <td className="px-6 py-4 text-sm text-gray-700 font-medium">{cliente.nombre}</td>
                     <td className="px-6 py-4 text-sm text-gray-700">{cliente.correo}</td>
                     <td className="px-6 py-4 text-sm">
-                      <Link
-                        href={`/pedidos?clienteId=${cliente.id}`}
-                        className="text-blue-600 hover:text-blue-800 font-medium"
-                      >
-                        Ver Pedidos
-                      </Link>
+                      <div className="flex justify-center items-center gap-6">
+                        <Link
+                          href={`/clientes/pedidos/${cliente.id}`}
+                          className="text-blue-600 hover:text-blue-800 font-medium"
+                        >
+                          Ver Pedidos
+                        </Link>
+                        <button
+                          onClick={() => abrirEdicion(cliente)}
+                          className="text-gray-900 hover:scale-110 transition text-2xl"
+                          title="Editar cliente"
+                        >
+                          ✎
+                        </button>
+                        <button
+                          onClick={() => eliminarCliente(cliente.id)}
+                          className="text-gray-950 hover:scale-110 transition text-2xl font-bold"
+                          title="Eliminar cliente"
+                        >
+                          🗑
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
