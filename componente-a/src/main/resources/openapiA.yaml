@@ -1,0 +1,66 @@
+openapi: 3.0.3
+info:
+  title: API Componente A - Pedidos y Clientes
+  version: 1.0.0
+  description: API REST para gestión de pedidos y clientes en la empresa de logística.
+servers:
+  - url: http://localhost:8080
+paths:
+  /api/pedidos:
+    get:
+      summary: Listar todos los pedidos
+      responses:
+        '200':
+          description: Lista de pedidos obtenida correctamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Pedido'
+    post:
+      summary: Registrar un nuevo pedido
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Pedido'
+      responses:
+        '201':
+          description: Pedido registrado correctamente
+        '400':
+          description: Error de validación
+  /api/pedidos/{id}:
+    get:
+      summary: Obtener pedido por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Pedido encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pedido'
+        '404':
+          description: Pedido no encontrado
+components:
+  schemas:
+    Pedido:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        descripcion:
+          type: string
+          example: PEDIDO-1731460
+        total:
+          type: number
+          format: double
+          example: 250.75

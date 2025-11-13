@@ -5,6 +5,7 @@ import com.empresa.a.service.PedidoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.empresa.c.util.MetodosCompartidos;
 
 import java.util.List;
 
@@ -29,7 +30,12 @@ public class PedidoController {
 
     @PostMapping
     public Pedido registrarPedido(@RequestBody Pedido pedido) {
-        return pedidoService.guardar(pedido);
+
+            String codigo = MetodosCompartidos.generarCodigoUnico("pedido");
+pedido.setDescripcion("Pedido generado con código: " + codigo);
+        Pedido nuevoPedido = pedidoService.guardar(pedido);
+MetodosCompartidos.notificarRegistro("http://localhost:8081/api/facturas"); // ejemplo circular
+return nuevoPedido;
     }
 
     @DeleteMapping("/{id}")
@@ -37,4 +43,5 @@ public class PedidoController {
         pedidoService.eliminar(id);
         return ResponseEntity.noContent().build();
     }
+
 }
