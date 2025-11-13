@@ -80,7 +80,8 @@ export default function ProveedoresPage() {
                 type="text"
                 value={formData.nombre}
                 onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 bg-white"
+                placeholder="Ej. ACME S.A."
                 required
               />
             </div>
@@ -90,7 +91,8 @@ export default function ProveedoresPage() {
                 type="email"
                 value={formData.correo}
                 onChange={(e) => setFormData({ ...formData, correo: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 bg-white"
+                placeholder="Ej. ventas@acme.com"
                 required
               />
             </div>
@@ -100,7 +102,8 @@ export default function ProveedoresPage() {
                 type="tel"
                 value={formData.telefono}
                 onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 bg-white"
+                placeholder="Ej. +56912345678"
               />
             </div>
             <div className="flex gap-2">

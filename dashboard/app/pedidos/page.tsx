@@ -129,7 +129,8 @@ export default function PedidosPage() {
                 type="number"
                 value={formData.clienteId}
                 onChange={(e) => setFormData({ ...formData, clienteId: parseInt(e.target.value) })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900 bg-white"
+                placeholder="Ej. 1"
                 required
               />
             </div>
@@ -143,14 +144,14 @@ export default function PedidosPage() {
                     placeholder="Nombre del producto"
                     value={producto.nombre}
                     onChange={(e) => handleProductoChange(index, "nombre", e.target.value)}
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="flex-1 px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900 bg-white"
                   />
                   <input
                     type="number"
                     placeholder="Precio"
                     value={producto.precio}
                     onChange={(e) => handleProductoChange(index, "precio", parseFloat(e.target.value))}
-                    className="w-32 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="w-32 px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900 bg-white"
                   />
                   {formData.productos.length > 1 && (
                     <button

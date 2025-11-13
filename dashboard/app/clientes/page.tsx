@@ -79,7 +79,8 @@ export default function ClientesPage() {
                 type="text"
                 value={formData.nombre}
                 onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white"
+                placeholder="Ej. Juan Pérez"
                 required
               />
             </div>
@@ -89,7 +90,8 @@ export default function ClientesPage() {
                 type="email"
                 value={formData.correo}
                 onChange={(e) => setFormData({ ...formData, correo: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white"
+                placeholder="Ej. juan@example.com"
                 required
               />
             </div>
