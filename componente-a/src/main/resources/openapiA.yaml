@@ -6,6 +6,55 @@ info:
 servers:
   - url: http://localhost:8080
 paths:
+  /api/clientes:
+    get:
+      summary: Listar todos los clientes
+      responses:
+        '200':
+          description: Lista de clientes obtenida correctamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Cliente'
+    post:
+      summary: Crear un cliente
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClienteInput'
+      responses:
+        '201':
+          description: Cliente creado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cliente'
+        '400':
+          description: Datos inválidos
+
+  /api/clientes/{id}:
+    get:
+      summary: Obtener un cliente por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Cliente encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cliente'
+        '404':
+          description: Cliente no encontrado
+
   /api/pedidos:
     get:
       summary: Listar todos los pedidos
@@ -25,12 +74,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Pedido'
+              $ref: '#/components/schemas/PedidoInput'
       responses:
         '201':
           description: Pedido registrado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pedido'
         '400':
           description: Error de validación
+
   /api/pedidos/{id}:
     get:
       summary: Obtener pedido por ID
@@ -49,18 +103,68 @@ paths:
                 $ref: '#/components/schemas/Pedido'
         '404':
           description: Pedido no encontrado
+
 components:
   schemas:
-    Pedido:
+    Cliente:
       type: object
       properties:
         id:
           type: integer
           example: 1
-        descripcion:
+        nombre:
           type: string
-          example: PEDIDO-1731460
+          example: Juan Perez
+        correo:
+          type: string
+          format: email
+          example: juan.perez@example.com
+
+    ClienteInput:
+      type: object
+      required:
+        - nombre
+        - correo
+      properties:
+        nombre:
+          type: string
+        correo:
+          type: string
+          format: email
+
+    Producto:
+      type: object
+      properties:
+        nombre:
+          type: string
+        precio:
+          type: number
+          format: double
+
+    Pedido:
+      type: object
+      properties:
+        id:
+          type: integer
+        clienteId:
+          type: integer
+        productos:
+          type: array
+          items:
+            $ref: '#/components/schemas/Producto'
         total:
           type: number
           format: double
-          example: 250.75
+
+    PedidoInput:
+      type: object
+      required:
+        - clienteId
+        - productos
+      properties:
+        clienteId:
+          type: integer
+        productos:
+          type: array
+          items:
+            $ref: '#/components/schemas/Producto'
