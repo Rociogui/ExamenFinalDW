@@ -217,11 +217,13 @@ export default function PedidosPage() {
               ) : (
                 pedidos.map((pedido) => (
                   <tr key={pedido.id} className="border-b hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm text-gray-700">{pedido.id}</td>
-                    <td className="px-6 py-4 text-sm text-gray-700 font-medium">{pedido.descripcion}</td>
-                    <td className="px-6 py-4 text-sm text-gray-700">{pedido.clienteId}</td>
+                    <td className="px-6 py-4 text-sm text-gray-700 font-semibold">{pedido.id}</td>
+                    <td className="px-6 py-4 text-sm text-gray-700">{pedido.descripcion || "—"}</td>
+                    <td className="px-6 py-4 text-sm text-gray-700 font-medium">
+                      {pedido.clienteId || "—"}
+                    </td>
                     <td className="px-6 py-4 text-sm font-bold text-green-600">
-                      ${pedido.total?.toFixed(2) || "0.00"}
+                      Q.{(pedido.total || 0).toFixed(2)}
                     </td>
                   </tr>
                 ))

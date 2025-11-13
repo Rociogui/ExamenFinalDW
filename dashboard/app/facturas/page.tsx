@@ -217,11 +217,11 @@ export default function FacturasPage() {
               ) : (
                 facturas.map((factura) => (
                   <tr key={factura.id} className="border-b hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm text-gray-700">{factura.id}</td>
-                    <td className="px-6 py-4 text-sm text-gray-700 font-medium">{factura.numero}</td>
-                    <td className="px-6 py-4 text-sm text-gray-700">{factura.proveedorId}</td>
+                    <td className="px-6 py-4 text-sm text-gray-700 font-semibold">{factura.id}</td>
+                    <td className="px-6 py-4 text-sm text-gray-700 font-medium">{factura.numero || "—"}</td>
+                    <td className="px-6 py-4 text-sm text-gray-700">{factura.proveedorId || "—"}</td>
                     <td className="px-6 py-4 text-sm font-bold text-purple-600">
-                      ${factura.totalFactura?.toFixed(2) || "0.00"}
+                      Q.{(factura.totalFactura || 0).toFixed(2)}
                     </td>
                   </tr>
                 ))
