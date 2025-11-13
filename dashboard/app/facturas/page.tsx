@@ -1,8 +1,21 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { API_BASE_B, fetchAPI } from "@/lib/api";
+import { API_BASE_A, API_BASE_B, fetchAPI } from "@/lib/api";
 import { useSearchParams } from "next/navigation";
+
+interface Proveedor {
+  id: number;
+  nombre: string;
+  correo: string;
+  telefono: string;
+}
+
+interface Pedido {
+  id: number;
+  clienteId: number;
+  total: number;
+}
 
 interface PedidoReferencia {
   pedidoId: number;
@@ -19,29 +32,37 @@ interface Factura {
 
 export default function FacturasPage() {
   const searchParams = useSearchParams();
-  const proveedorId = searchParams.get("proveedorId");
+  const proveedorIdParam = searchParams.get("proveedorId");
 
+  const [proveedores, setProveedores] = useState<Proveedor[]>([]);
+  const [pedidosDisponibles, setPedidosDisponibles] = useState<Pedido[]>([]);
   const [facturas, setFacturas] = useState<Factura[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
-    proveedorId: proveedorId ? parseInt(proveedorId) : 0,
+    proveedorId: proveedorIdParam ? parseInt(proveedorIdParam) : 0,
     pedidos: [{ pedidoId: 0, total: 0 }],
   });
 
   useEffect(() => {
-    cargarFacturas();
+    cargarDatos();
   }, []);
 
-  const cargarFacturas = async () => {
+  const cargarDatos = async () => {
     try {
       setLoading(true);
-      const data = await fetchAPI(`${API_BASE_B}/facturas`);
-      setFacturas(data);
+      const [proveedoresData, pedidosData, facturasData] = await Promise.all([
+        fetchAPI(`${API_BASE_B}/proveedores`),
+        fetchAPI(`${API_BASE_A}/pedidos`),
+        fetchAPI(`${API_BASE_B}/facturas`),
+      ]);
+      setProveedores(proveedoresData);
+      setPedidosDisponibles(pedidosData);
+      setFacturas(facturasData);
       setError("");
     } catch (err) {
-      setError("Error al cargar facturas");
+      setError("Error al cargar datos");
       console.error(err);
     } finally {
       setLoading(false);
@@ -50,7 +71,15 @@ export default function FacturasPage() {
 
   const handlePedidoChange = (index: number, field: string, value: any) => {
     const newPedidos = [...formData.pedidos];
-    newPedidos[index] = { ...newPedidos[index], [field]: value };
+    if (field === "pedidoId") {
+      const pedidoSeleccionado = pedidosDisponibles.find((p) => p.id === parseInt(value));
+      newPedidos[index] = {
+        pedidoId: parseInt(value),
+        total: pedidoSeleccionado?.total || 0,
+      };
+    } else {
+      newPedidos[index] = { ...newPedidos[index], [field]: value };
+    }
     setFormData({ ...formData, pedidos: newPedidos });
   };
 
@@ -87,7 +116,7 @@ export default function FacturasPage() {
       });
       setFacturas([...facturas, response]);
       setFormData({
-        proveedorId: proveedorId ? parseInt(proveedorId) : 0,
+        proveedorId: proveedorIdParam ? parseInt(proveedorIdParam) : 0,
         pedidos: [{ pedidoId: 0, total: 0 }],
       });
       setShowForm(false);
@@ -124,53 +153,70 @@ export default function FacturasPage() {
           <h2 className="text-xl font-bold text-gray-800 mb-4">Crear Nueva Factura</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">ID Proveedor</label>
-              <input
-                type="number"
+              <label className="block text-sm font-medium text-gray-700 mb-1">Proveedor</label>
+              <select
                 value={formData.proveedorId}
                 onChange={(e) => setFormData({ ...formData, proveedorId: parseInt(e.target.value) })}
                 className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 bg-white"
-                placeholder="Ej. 1"
                 required
-              />
+              >
+                <option value={0}>Seleccionar proveedor...</option>
+                {proveedores.map((proveedor) => (
+                  <option key={proveedor.id} value={proveedor.id}>
+                    {proveedor.nombre} ({proveedor.correo})
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Pedidos</label>
-              {formData.pedidos.map((pedido, index) => (
-                <div key={index} className="flex gap-2 mb-2">
-                  <input
-                    type="number"
-                    placeholder="ID Pedido"
-                    value={pedido.pedidoId}
-                    onChange={(e) => handlePedidoChange(index, "pedidoId", parseInt(e.target.value))}
-                    className="w-32 px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 bg-white"
-                  />
-                  <input
-                    type="number"
-                    placeholder="Total"
-                    value={pedido.total}
-                    onChange={(e) => handlePedidoChange(index, "total", parseFloat(e.target.value))}
-                    className="flex-1 px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 bg-white"
-                  />
-                  {formData.pedidos.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => removePedido(index)}
-                      className="bg-red-500 text-white px-3 py-2 rounded hover:bg-red-600"
+              <div className="space-y-3">
+                {formData.pedidos.map((pedido, index) => (
+                  <div key={index} className="flex gap-2">
+                    <select
+                      value={pedido.pedidoId}
+                      onChange={(e) => handlePedidoChange(index, "pedidoId", e.target.value)}
+                      className="flex-1 px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 bg-white"
                     >
-                      ✕
-                    </button>
-                  )}
-                </div>
-              ))}
+                      <option value={0}>Seleccionar pedido...</option>
+                      {pedidosDisponibles.map((p) => (
+                        <option key={p.id} value={p.id}>
+                          Pedido #{p.id} - Cliente {p.clienteId} - Q.{p.total.toFixed(2)}
+                        </option>
+                      ))}
+                    </select>
+                    <input
+                      type="number"
+                      value={pedido.total}
+                      disabled
+                      className="w-32 px-4 py-2 border-2 border-gray-300 rounded-lg text-gray-900 bg-gray-100 cursor-not-allowed"
+                    />
+                    {formData.pedidos.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removePedido(index)}
+                        className="bg-red-500 text-white px-3 py-2 rounded hover:bg-red-600"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
               <button
                 type="button"
                 onClick={addPedido}
-                className="mt-2 text-purple-600 hover:text-purple-800 font-medium"
+                className="mt-3 text-purple-600 hover:text-purple-800 font-medium"
               >
                 + Agregar Pedido
               </button>
+            </div>
+
+            <div className="bg-purple-50 p-4 rounded-lg border-2 border-purple-200">
+              <p className="text-sm font-medium text-gray-700">
+                Total Factura: <span className="text-lg font-bold text-purple-600">Q.{calcularTotal(formData.pedidos).toFixed(2)}</span>
+              </p>
             </div>
 
             <div className="flex gap-2">

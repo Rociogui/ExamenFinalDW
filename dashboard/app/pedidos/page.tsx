@@ -2,7 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { API_BASE_A, fetchAPI } from "@/lib/api";
+import { PRODUCTOS_CATALOGO } from "@/lib/productos";
 import { useSearchParams } from "next/navigation";
+
+interface Cliente {
+  id: number;
+  nombre: string;
+  correo: string;
+}
 
 interface Producto {
   nombre: string;
@@ -19,29 +26,34 @@ interface Pedido {
 
 export default function PedidosPage() {
   const searchParams = useSearchParams();
-  const clienteId = searchParams.get("clienteId");
+  const clienteIdParam = searchParams.get("clienteId");
 
+  const [clientes, setClientes] = useState<Cliente[]>([]);
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
-    clienteId: clienteId ? parseInt(clienteId) : 0,
+    clienteId: clienteIdParam ? parseInt(clienteIdParam) : 0,
     productos: [{ nombre: "", precio: 0 }],
   });
 
   useEffect(() => {
-    cargarPedidos();
+    cargarDatos();
   }, []);
 
-  const cargarPedidos = async () => {
+  const cargarDatos = async () => {
     try {
       setLoading(true);
-      const data = await fetchAPI(`${API_BASE_A}/pedidos`);
-      setPedidos(data);
+      const [clientesData, pedidosData] = await Promise.all([
+        fetchAPI(`${API_BASE_A}/clientes`),
+        fetchAPI(`${API_BASE_A}/pedidos`),
+      ]);
+      setClientes(clientesData);
+      setPedidos(pedidosData);
       setError("");
     } catch (err) {
-      setError("Error al cargar pedidos");
+      setError("Error al cargar datos");
       console.error(err);
     } finally {
       setLoading(false);
@@ -50,7 +62,15 @@ export default function PedidosPage() {
 
   const handleProductoChange = (index: number, field: string, value: any) => {
     const newProductos = [...formData.productos];
-    newProductos[index] = { ...newProductos[index], [field]: value };
+    if (field === "nombre") {
+      const productoSeleccionado = PRODUCTOS_CATALOGO.find((p) => p.nombre === value);
+      newProductos[index] = {
+        nombre: value,
+        precio: productoSeleccionado?.precio || 0,
+      };
+    } else {
+      newProductos[index] = { ...newProductos[index], [field]: value };
+    }
     setFormData({ ...formData, productos: newProductos });
   };
 
@@ -87,7 +107,7 @@ export default function PedidosPage() {
       });
       setPedidos([...pedidos, response]);
       setFormData({
-        clienteId: clienteId ? parseInt(clienteId) : 0,
+        clienteId: clienteIdParam ? parseInt(clienteIdParam) : 0,
         productos: [{ nombre: "", precio: 0 }],
       });
       setShowForm(false);
@@ -124,53 +144,70 @@ export default function PedidosPage() {
           <h2 className="text-xl font-bold text-gray-800 mb-4">Crear Nuevo Pedido</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">ID Cliente</label>
-              <input
-                type="number"
+              <label className="block text-sm font-medium text-gray-700 mb-1">Cliente</label>
+              <select
                 value={formData.clienteId}
                 onChange={(e) => setFormData({ ...formData, clienteId: parseInt(e.target.value) })}
                 className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900 bg-white"
-                placeholder="Ej. 1"
                 required
-              />
+              >
+                <option value={0}>Seleccionar cliente...</option>
+                {clientes.map((cliente) => (
+                  <option key={cliente.id} value={cliente.id}>
+                    {cliente.nombre} ({cliente.correo})
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Productos</label>
-              {formData.productos.map((producto, index) => (
-                <div key={index} className="flex gap-2 mb-2">
-                  <input
-                    type="text"
-                    placeholder="Nombre del producto"
-                    value={producto.nombre}
-                    onChange={(e) => handleProductoChange(index, "nombre", e.target.value)}
-                    className="flex-1 px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900 bg-white"
-                  />
-                  <input
-                    type="number"
-                    placeholder="Precio"
-                    value={producto.precio}
-                    onChange={(e) => handleProductoChange(index, "precio", parseFloat(e.target.value))}
-                    className="w-32 px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900 bg-white"
-                  />
-                  {formData.productos.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => removeProducto(index)}
-                      className="bg-red-500 text-white px-3 py-2 rounded hover:bg-red-600"
+              <label className="block text-sm font-medium text-gray-700 mb-2">Productos del Catálogo</label>
+              <div className="space-y-3">
+                {formData.productos.map((producto, index) => (
+                  <div key={index} className="flex gap-2">
+                    <select
+                      value={producto.nombre}
+                      onChange={(e) => handleProductoChange(index, "nombre", e.target.value)}
+                      className="flex-1 px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900 bg-white"
                     >
-                      ✕
-                    </button>
-                  )}
-                </div>
-              ))}
+                      <option value="">Seleccionar producto...</option>
+                      {PRODUCTOS_CATALOGO.map((prod) => (
+                        <option key={prod.id} value={prod.nombre}>
+                          {prod.nombre} - Q.{prod.precio.toFixed(2)}
+                        </option>
+                      ))}
+                    </select>
+                    <input
+                      type="number"
+                      value={producto.precio}
+                      disabled
+                      className="w-32 px-4 py-2 border-2 border-gray-300 rounded-lg text-gray-900 bg-gray-100 cursor-not-allowed"
+                    />
+                    {formData.productos.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeProducto(index)}
+                        className="bg-red-500 text-white px-3 py-2 rounded hover:bg-red-600"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
               <button
                 type="button"
                 onClick={addProducto}
-                className="mt-2 text-blue-600 hover:text-blue-800 font-medium"
+                className="mt-3 text-blue-600 hover:text-blue-800 font-medium"
               >
                 + Agregar Producto
               </button>
+            </div>
+
+            <div className="bg-blue-50 p-4 rounded-lg border-2 border-blue-200">
+              <p className="text-sm font-medium text-gray-700">
+                Total Estimado: <span className="text-lg font-bold text-blue-600">Q.{calcularTotal(formData.productos).toFixed(2)}</span>
+              </p>
             </div>
 
             <div className="flex gap-2">
