@@ -1,6 +1,7 @@
 package com.empresa.b.model;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 
 @Data
@@ -16,6 +17,7 @@ public class Factura {
 
     @ManyToOne
     @JoinColumn(name = "proveedor_id")
+    @JsonManagedReference
     private Proveedor proveedor;
 
 }

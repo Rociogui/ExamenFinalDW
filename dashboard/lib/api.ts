@@ -25,9 +25,23 @@ export async function fetchAPI(url: string, options?: RequestInit) {
       throw new Error(`API Error ${response.status}: ${errorText}`);
     }
 
-    const data = await response.json();
-    console.log(`[API] Response data:`, data);
-    return data;
+    const responseText = await response.text();
+    console.log(`[API] Response text:`, responseText);
+    
+    // Parse JSON de manera segura
+    if (!responseText) {
+      return null;
+    }
+    
+    try {
+      const data = JSON.parse(responseText);
+      console.log(`[API] Response data:`, data);
+      return data;
+    } catch (jsonError) {
+      console.error("[API] Error parsing JSON:", jsonError);
+      // Si falla el parsing, devolvemos el texto como está
+      return responseText;
+    }
   } catch (error) {
     console.error("[API] Fetch error:", error);
     throw error;

@@ -1,6 +1,7 @@
 package com.empresa.a.model;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import java.util.List;
 
 @Entity
@@ -12,6 +13,7 @@ public class Cliente {
     private String correo;
 
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
+    @JsonBackReference
     private List<Pedido> pedidos;
 
  public Cliente() {}
