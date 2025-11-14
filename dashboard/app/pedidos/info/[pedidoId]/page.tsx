@@ -115,21 +115,21 @@ export default function PedidoInfoPage() {
       )}
 
       {/* Información del Pedido */}
-      <div className="bg-blue-600 rounded-lg shadow-md p-8 text-white">
+      <div className="bg-[#2563EB] rounded-lg shadow-md p-8 text-white">
         <h1 className="text-4xl font-bold mb-2">Información del Pedido</h1>
         <p className="text-blue-100 text-lg mb-4">
           Cliente: <span className="font-bold">{cliente?.nombre || "—"} ({clienteIdFormateado})</span>
         </p>
         <div className="mt-6 grid grid-cols-3 gap-4">
-          <div className="bg-blue-700 rounded-lg p-4">
+          <div className="bg-[#1E40AF] rounded-lg p-4">
             <p className="text-blue-100 text-sm">ID Pedido</p>
             <p className="text-3xl font-bold font-mono">{pedidoIdFormateado}</p>
           </div>
-          <div className="bg-blue-700 rounded-lg p-4">
+          <div className="bg-[#1E40AF] rounded-lg p-4">
             <p className="text-blue-100 text-sm">Código</p>
             <p className="text-2xl font-bold font-mono">{pedido?.descripcion || "—"}</p>
           </div>
-          <div className="bg-blue-700 rounded-lg p-4">
+          <div className="bg-[#1E40AF] rounded-lg p-4">
             <p className="text-blue-100 text-sm">Total Pedido</p>
             <p className="text-3xl font-bold">Q.{formatearPrecio(pedido?.total || 0)}</p>
           </div>
@@ -138,16 +138,16 @@ export default function PedidoInfoPage() {
 
       {/* Información del Cliente */}
       {cliente && (
-        <div className="bg-gradient-to-r from-amber-600 to-amber-800 rounded-lg shadow-md p-8 text-white">
+        <div className="bg-[#334155] rounded-lg shadow-md p-8 text-white">
           <h2 className="text-3xl font-bold mb-2">{cliente.nombre}</h2>
-          <p className="text-amber-100 text-lg">{cliente.correo}</p>
+          <p className="text-gray-300 text-lg">{cliente.correo}</p>
           <div className="mt-6 grid grid-cols-2 gap-4">
-            <div className="bg-amber-700 rounded-lg p-4">
-              <p className="text-amber-100 text-sm">Artículos en Pedido</p>
+            <div className="bg-[#1E40AF] rounded-lg p-4">
+              <p className="text-blue-100 text-sm">Artículos en Pedido</p>
               <p className="text-3xl font-bold">{pedido?.productos?.length || 0}</p>
             </div>
-            <div className="bg-amber-700 rounded-lg p-4">
-              <p className="text-amber-100 text-sm">Total del Pedido</p>
+            <div className="bg-[#1E40AF] rounded-lg p-4">
+              <p className="text-blue-100 text-sm">Total del Pedido</p>
               <p className="text-3xl font-bold">Q.{formatearPrecio(pedido?.total || 0)}</p>
             </div>
           </div>
