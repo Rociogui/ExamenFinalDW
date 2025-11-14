@@ -19,4 +19,6 @@ public class Proveedor {
 
     private String telefono;
 
+    @Column(nullable = false)
+    private String contacto;
 }

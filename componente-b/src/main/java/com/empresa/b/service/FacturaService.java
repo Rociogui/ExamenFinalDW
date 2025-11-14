@@ -1,5 +1,4 @@
 package com.empresa.b.service;
-import com.empresa.c.Utils;
 
 import com.empresa.b.model.Factura;
 import com.empresa.b.repository.FacturaRepository;
@@ -8,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class FacturaService {
@@ -25,7 +25,9 @@ public class FacturaService {
 
     public Factura guardar(Factura factura) {
         if (factura.getTotalFactura() == null) factura.setTotalFactura(0.0);
-        factura.setNumero(Utils.generarCodigoUnico("FACT"));
+        if (factura.getNumero() == null) {
+            factura.setNumero("FAC-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
+        }
         return facturaRepository.save(factura);
     }
 

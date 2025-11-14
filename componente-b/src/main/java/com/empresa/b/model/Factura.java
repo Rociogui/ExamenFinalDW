@@ -1,7 +1,7 @@
 package com.empresa.b.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 
 @Data
@@ -13,11 +13,11 @@ public class Factura {
     private Long id;
 
     private String numero;
+    
     private Double totalFactura;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "proveedor_id")
-    @JsonManagedReference
+    @JsonIgnoreProperties("facturas")
     private Proveedor proveedor;
-
 }
