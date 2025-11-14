@@ -1,32 +1,22 @@
-// Catálogo de productos basado en multiproductosgt.com
+// Catálogo de computadoras
 export const PRODUCTOS_CATALOGO = [
-  // Limpieza
-  { id: 1, nombre: "Desinfectante Multiusos 1L", precio: 25.00, categoria: "Limpieza" },
-  { id: 2, nombre: "Cloro Blanqueador 1L", precio: 15.00, categoria: "Limpieza" },
-  { id: 3, nombre: "Jabón Líquido 1L", precio: 20.00, categoria: "Limpieza" },
-  { id: 4, nombre: "Detergente en Polvo 1kg", precio: 18.00, categoria: "Limpieza" },
-  { id: 5, nombre: "Limpiador de Pisos 1L", precio: 22.00, categoria: "Limpieza" },
-
-  // Higiene Personal
-  { id: 6, nombre: "Jabón de Baño 100g", precio: 5.00, categoria: "Higiene Personal" },
-  { id: 7, nombre: "Champú 400ml", precio: 18.00, categoria: "Higiene Personal" },
-  { id: 8, nombre: "Acondicionador 400ml", precio: 18.00, categoria: "Higiene Personal" },
-  { id: 9, nombre: "Pasta Dental 75ml", precio: 8.00, categoria: "Higiene Personal" },
-  { id: 10, nombre: "Desodorante Spray 250ml", precio: 12.00, categoria: "Higiene Personal" },
-
-  // Papel y Cartón
-  { id: 11, nombre: "Papel Higiénico 4 rollos", precio: 10.00, categoria: "Papel" },
-  { id: 12, nombre: "Servilletas 100 hojas", precio: 5.00, categoria: "Papel" },
-  { id: 13, nombre: "Papel Toalla 2 rollos", precio: 8.00, categoria: "Papel" },
-  { id: 14, nombre: "Pañales Desechables Talla M (30 piezas)", precio: 45.00, categoria: "Papel" },
-
-  // Electrodomésticos y Accesorios
-  { id: 15, nombre: "Escoba de Fibra", precio: 15.00, categoria: "Accesorios" },
-  { id: 16, nombre: "Recogedor de Basura", precio: 12.00, categoria: "Accesorios" },
-  { id: 17, nombre: "Trapo de Limpieza 5 piezas", precio: 10.00, categoria: "Accesorios" },
-  { id: 18, nombre: "Guantes de Látex (par)", precio: 8.00, categoria: "Accesorios" },
-  { id: 19, nombre: "Bolsas de Basura 30 unidades", precio: 20.00, categoria: "Accesorios" },
+  { id: 1, nombre: "ASUS", modelo: "VIVOBOOK E1504GA-WS36", ram: "8GB RAM", precio: 3599.00, categoria: "Computadoras" },
+  { id: 2, nombre: "VICTUS", modelo: "15-FB3093DX RYZEN 7 7435HS", ram: "16GB RAM", precio: 8599.00, categoria: "Computadoras" },
+  { id: 3, nombre: "ASUS", modelo: "TUF A17TNT-A16 RYZEN 7-7735HS", ram: "16GB RAM", precio: 9649.00, categoria: "Computadoras" },
+  { id: 4, nombre: "VICTUS", modelo: "15-FA2701WM I5-13420H", ram: "16GB RAM", precio: 7899.00, categoria: "Computadoras" },
+  { id: 5, nombre: "VICTUS", modelo: "15-FB2063DX RYZEN 5 7535HS", ram: "8GB RAM", precio: 5799.00, categoria: "Computadoras" },
+  { id: 6, nombre: "ACER", modelo: "NITRO V15 ANV15-51-93PU I9-13900H", ram: "16GB RAM", precio: 9299.00, categoria: "Computadoras" },
+  { id: 7, nombre: "ASUS", modelo: "VIVOBOOK F1605VA-AB74 I7-13650", ram: "16GB RAM", precio: 6849.00, categoria: "Computadoras" },
+  { id: 8, nombre: "ASUS", modelo: "VIVOBOOK 14A4V I5-1334U", ram: "12GB RAM", precio: 4229.00, categoria: "Computadoras" },
 ];
+
+export function formatearPrecio(precio: number): string {
+  return `Q.${precio.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
+export function obtenerNombreCompleto(producto: any): string {
+  return `${producto.nombre} - ${producto.ram} - ${formatearPrecio(producto.precio)}`;
+}
 
 export function obtenerProductoPorId(id: number) {
   return PRODUCTOS_CATALOGO.find((p) => p.id === id);

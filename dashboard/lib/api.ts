@@ -9,12 +9,14 @@ export async function fetchAPI(url: string, options?: RequestInit) {
   try {
     console.log(`[API] Llamando a: ${url} con método: ${options?.method || "GET"}`);
     
+    const headers: HeadersInit = {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    };
+
     const response = await fetch(url, {
       ...options,
-      headers: {
-        "Content-Type": "application/json",
-        ...options?.headers,
-      },
+      headers,
     });
 
     console.log(`[API] Response status: ${response.status}`);
