@@ -50,15 +50,22 @@ public class FacturaController {
         String numero = "FAC-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         factura.setNumero(numero);
         
-        // Calcular total desde los pedidos
-        List<Map<String, Object>> pedidosData = (List<Map<String, Object>>) data.get("pedidos");
-        if (pedidosData != null && !pedidosData.isEmpty()) {
-            double total = pedidosData.stream()
-                    .mapToDouble(p -> ((Number) p.getOrDefault("total", 0)).doubleValue())
-                    .sum();
+        // Obtener el total desde el frontend o calcular desde pedidos
+        if (data.containsKey("totalFactura")) {
+            // Leer el total directamente del payload
+            double total = ((Number) data.get("totalFactura")).doubleValue();
             factura.setTotalFactura(total);
         } else {
-            factura.setTotalFactura(0.0);
+            // Calcular total desde los pedidos (compatibilidad con versión anterior)
+            List<Map<String, Object>> pedidosData = (List<Map<String, Object>>) data.get("pedidos");
+            if (pedidosData != null && !pedidosData.isEmpty()) {
+                double total = pedidosData.stream()
+                        .mapToDouble(p -> ((Number) p.getOrDefault("total", 0)).doubleValue())
+                        .sum();
+                factura.setTotalFactura(total);
+            } else {
+                factura.setTotalFactura(0.0);
+            }
         }
         
         return facturaService.guardar(factura);
