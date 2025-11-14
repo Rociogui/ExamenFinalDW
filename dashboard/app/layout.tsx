@@ -26,7 +26,7 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#ecdfcd]`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#F3F4F6]`}
       >
         <div className="min-h-screen flex flex-col">
           {/* Header */}
@@ -39,7 +39,7 @@ export default function RootLayout({
 
           <div className="flex flex-1">
             {/* Sidebar Navigation */}
-            <aside className="w-64 bg-[#ecdfcd] shadow-md">
+            <aside className="w-64 bg-[#F3F4F6] shadow-md">
               <nav className="p-6 space-y-2">
                 <Link href="/" className="block px-4 py-3 rounded-lg text-black hover:bg-[#be8c6b] hover:text-white font-medium transition">
                   Inicio
@@ -68,7 +68,7 @@ export default function RootLayout({
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 p-8 bg-[#ecdfcd]">
+            <main className="flex-1 p-8 bg-[#F3F4F6]">
               {children}
             </main>
           </div>
