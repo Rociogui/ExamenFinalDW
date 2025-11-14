@@ -43,14 +43,18 @@ public class ClienteController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Cliente> actualizarCliente(@PathVariable Long id, @RequestBody Cliente clienteActualizado) {
-        return clienteService.obtenerPorId(id)
-                .map(clienteExistente -> {
-                    clienteExistente.setNombre(clienteActualizado.getNombre());
-                    clienteExistente.setCorreo(clienteActualizado.getCorreo());
-                    return ResponseEntity.ok(clienteService.guardar(clienteExistente));
-                })
-                .orElse(ResponseEntity.notFound().build());
+    public Cliente actualizarCliente(@PathVariable Long id, @RequestBody Cliente clienteActualizado) {
+        try {
+            return clienteService.obtenerPorId(id)
+                    .map(clienteExistente -> {
+                        clienteExistente.setNombre(clienteActualizado.getNombre());
+                        clienteExistente.setCorreo(clienteActualizado.getCorreo());
+                        return clienteService.guardar(clienteExistente);
+                    })
+                    .orElseThrow(() -> new RuntimeException("Cliente no encontrado con ID: " + id));
+        } catch (Exception e) {
+            throw new RuntimeException("Error al actualizar cliente: " + e.getMessage(), e);
+        }
     }
 
     @DeleteMapping("/{id}")
