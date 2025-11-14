@@ -43,61 +43,61 @@ export default function Home() {
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Card: Clientes */}
-        <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+        <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-600">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-500 text-sm">Total Clientes</p>
-              <p className="text-3xl font-bold text-blue-600 mt-2">
+              <p className="text-3xl font-bold text-purple-600 mt-2">
                 {loading ? "..." : stats.clientes}
               </p>
             </div>
-            <span className="text-4xl">👥</span>
+            <div className="text-4xl">👥</div>
           </div>
         </div>
 
         {/* Card: Pedidos */}
-        <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
+        <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-amber-700">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-500 text-sm">Total Pedidos</p>
-              <p className="text-3xl font-bold text-green-600 mt-2">
+              <p className="text-3xl font-bold text-amber-700 mt-2">
                 {loading ? "..." : stats.pedidos}
               </p>
             </div>
-            <span className="text-4xl">📦</span>
+            <div className="text-4xl">📦</div>
           </div>
         </div>
 
         {/* Card: Proveedores */}
-        <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-orange-500">
+        <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-cyan-500">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-500 text-sm">Total Proveedores</p>
-              <p className="text-3xl font-bold text-orange-600 mt-2">
+              <p className="text-gray-500 text-sm whitespace-nowrap">Total Proveedores</p>
+              <p className="text-3xl font-bold text-cyan-500 mt-2">
                 {loading ? "..." : stats.proveedores}
               </p>
             </div>
-            <span className="text-4xl">🏢</span>
+            <div className="text-4xl">🏢</div>
           </div>
         </div>
 
         {/* Card: Facturas */}
-        <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500">
+        <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-gray-500">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-500 text-sm">Total Facturas</p>
-              <p className="text-3xl font-bold text-purple-600 mt-2">
+              <p className="text-3xl font-bold text-gray-500 mt-2">
                 {loading ? "..." : stats.facturas}
               </p>
             </div>
-            <span className="text-4xl">📄</span>
+            <div className="text-4xl">📄</div>
           </div>
         </div>
       </div>
 
       {/* Welcome Section */}
       <div className="bg-white rounded-lg shadow-md p-8">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">Bienvenido a MULTISERVICIOS S.A.</h2>
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">Bienvenido a Multiproductos S.A.</h2>
         <p className="text-gray-600 mb-4">
           Este panel le permite gestionar de manera centralizada:
         </p>

@@ -15,8 +15,14 @@ export default function ClientesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showForm, setShowForm] = useState(false);
-  const [editingId, setEditingId] = useState<number | null>(null);
   const [formData, setFormData] = useState({ nombre: "", correo: "" });
+
+  // Función para formatear ID secuencial como "001", "002", etc
+  const formatId = (cliente: Cliente): string => {
+    // Encuentra el índice del cliente en la lista ordenada
+    const index = clientes.findIndex(c => c.id === cliente.id);
+    return String(index + 1).padStart(3, "0");
+  };
 
   useEffect(() => {
     cargarClientes();
@@ -26,7 +32,9 @@ export default function ClientesPage() {
     try {
       setLoading(true);
       const data = await fetchAPI(`${API_BASE_A}/clientes`);
-      setClientes(data);
+      // Ordenar por ID ascendente
+      const sortedData = data.sort((a: Cliente, b: Cliente) => a.id - b.id);
+      setClientes(sortedData);
       setError("");
     } catch (err) {
       setError("Error al cargar clientes");
@@ -36,38 +44,20 @@ export default function ClientesPage() {
     }
   };
 
-  const abrirEdicion = (cliente: Cliente) => {
-    setEditingId(cliente.id);
-    setFormData({ nombre: cliente.nombre, correo: cliente.correo });
-    setShowForm(true);
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      if (editingId) {
-        // Editar cliente existente
-        const response = await fetchAPI(`${API_BASE_A}/clientes/${editingId}`, {
-          method: "PUT",
-          body: JSON.stringify(formData),
-        });
-        setClientes(
-          clientes.map((c) => (c.id === editingId ? response : c))
-        );
-        setEditingId(null);
-      } else {
-        // Crear nuevo cliente
-        const response = await fetchAPI(`${API_BASE_A}/clientes`, {
-          method: "POST",
-          body: JSON.stringify(formData),
-        });
-        setClientes([...clientes, response]);
-      }
+      const response = await fetchAPI(`${API_BASE_A}/clientes`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      setClientes([...clientes, response]);
       setFormData({ nombre: "", correo: "" });
       setShowForm(false);
       setError("");
     } catch (err) {
-      setError("Error al guardar cliente");
+      setError("Error al crear cliente");
       console.error(err);
     }
   };
@@ -94,11 +84,10 @@ export default function ClientesPage() {
         <h1 className="text-3xl font-bold text-gray-900">Gestión de Clientes</h1>
         <button
           onClick={() => {
-            setEditingId(null);
             setFormData({ nombre: "", correo: "" });
             setShowForm(!showForm);
           }}
-          className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition font-medium"
+          className="bg-[#604a33] text-white px-6 py-2 rounded-lg hover:bg-[#4a3a28] transition font-medium"
         >
           + Nuevo Cliente
         </button>
@@ -112,9 +101,7 @@ export default function ClientesPage() {
 
       {showForm && (
         <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">
-            {editingId ? "Editar Cliente" : "Crear Nuevo Cliente"}
-          </h2>
+          <h2 className="text-xl font-bold text-gray-800 mb-4">Crear Nuevo Cliente</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
@@ -141,15 +128,14 @@ export default function ClientesPage() {
             <div className="flex gap-2">
               <button
                 type="submit"
-                className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition font-medium"
+                className="bg-[#7a9b76] text-white px-6 py-2 rounded-lg hover:bg-[#6a8b66] transition font-medium"
               >
-                {editingId ? "Actualizar" : "Guardar"}
+                Guardar
               </button>
               <button
                 type="button"
                 onClick={() => {
                   setShowForm(false);
-                  setEditingId(null);
                   setFormData({ nombre: "", correo: "" });
                 }}
                 className="bg-gray-400 text-white px-6 py-2 rounded-lg hover:bg-gray-500 transition font-medium"
@@ -186,24 +172,17 @@ export default function ClientesPage() {
               ) : (
                 clientes.map((cliente) => (
                   <tr key={cliente.id} className="border-b hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm text-gray-700">{cliente.id}</td>
+                    <td className="px-6 py-4 text-sm text-gray-700 font-mono font-semibold">{formatId(cliente)}</td>
                     <td className="px-6 py-4 text-sm text-gray-700 font-medium">{cliente.nombre}</td>
                     <td className="px-6 py-4 text-sm text-gray-700">{cliente.correo}</td>
                     <td className="px-6 py-4 text-sm">
                       <div className="flex justify-center items-center gap-6">
                         <Link
                           href={`/clientes/pedidos/${cliente.id}`}
-                          className="text-blue-600 hover:text-blue-800 font-medium"
+                          className="text-amber-700 hover:text-amber-900 font-medium"
                         >
                           Ver Pedidos
                         </Link>
-                        <button
-                          onClick={() => abrirEdicion(cliente)}
-                          className="text-gray-900 hover:scale-110 transition text-2xl"
-                          title="Editar cliente"
-                        >
-                          ✎
-                        </button>
                         <button
                           onClick={() => eliminarCliente(cliente.id)}
                           className="text-gray-950 hover:scale-110 transition text-2xl font-bold"

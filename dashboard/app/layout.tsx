@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "MULTISERVICIOS S.A. - Panel de Control",
-  description: "Panel administrativo para gestión de clientes, pedidos, proveedores y facturas",
+  title: "Multiproductos S.A. - Panel de Control",
+  description: "Sistema de gestión para Multiproductos S.A.",
 };
 
 export default function RootLayout({
@@ -26,56 +26,56 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#ecdfcd]`}
       >
         <div className="min-h-screen flex flex-col">
           {/* Header */}
-          <header className="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg">
+          <header className="bg-[#604a33] text-white shadow-lg">
             <div className="max-w-7xl mx-auto px-4 py-6">
-              <h1 className="text-3xl font-bold">MULTISERVICIOS S.A.</h1>
-              <p className="text-blue-100 mt-1">Panel de Control - Gestión de Pedidos y Facturas</p>
+              <h1 className="text-3xl font-bold">Multiproductos S.A.</h1>
+              <p className="text-[#ecdfcd] mt-1">Panel de Control - Gestión de Pedidos y Facturas</p>
             </div>
           </header>
 
           <div className="flex flex-1">
             {/* Sidebar Navigation */}
-            <aside className="w-64 bg-white shadow-md">
+            <aside className="w-64 bg-[#ecdfcd] shadow-md">
               <nav className="p-6 space-y-2">
-                <Link href="/" className="block px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 font-medium transition">
-                  📊 Inicio
+                <Link href="/" className="block px-4 py-3 rounded-lg text-black hover:bg-[#be8c6b] hover:text-white font-medium transition">
+                  Inicio
                 </Link>
                 
                 <div className="mt-6">
-                  <h3 className="px-4 py-2 text-sm font-bold text-gray-400 uppercase">Clientes y Pedidos</h3>
-                  <Link href="/clientes" className="block px-4 py-2 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
-                    👥 Clientes
+                  <h3 className="px-4 py-2 text-sm font-bold text-white uppercase bg-[#ecdfcd] rounded">Clientes y Pedidos</h3>
+                  <Link href="/clientes" className="block px-4 py-2 rounded-lg text-black hover:bg-[#be8c6b] hover:text-white transition">
+                    Clientes
                   </Link>
-                  <Link href="/pedidos" className="block px-4 py-2 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
-                    📦 Pedidos
+                  <Link href="/pedidos" className="block px-4 py-2 rounded-lg text-black hover:bg-[#be8c6b] hover:text-white transition">
+                    Pedidos
                   </Link>
                 </div>
 
                 <div className="mt-6">
-                  <h3 className="px-4 py-2 text-sm font-bold text-gray-400 uppercase">Proveedores y Facturas</h3>
-                  <Link href="/proveedores" className="block px-4 py-2 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
-                    🏢 Proveedores
+                  <h3 className="px-4 py-2 text-sm font-bold text-white uppercase bg-[#ecdfcd] rounded">Proveedores y Facturas</h3>
+                  <Link href="/proveedores" className="block px-4 py-2 rounded-lg text-black hover:bg-[#be8c6b] hover:text-white transition">
+                    Proveedores
                   </Link>
-                  <Link href="/facturas" className="block px-4 py-2 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
-                    📄 Facturas
+                  <Link href="/facturas" className="block px-4 py-2 rounded-lg text-black hover:bg-[#be8c6b] hover:text-white transition">
+                    Facturas
                   </Link>
                 </div>
               </nav>
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 p-8">
+            <main className="flex-1 p-8 bg-[#ecdfcd]">
               {children}
             </main>
           </div>
 
           {/* Footer */}
-          <footer className="bg-gray-800 text-gray-300 text-center py-4 mt-auto">
-            <p>© 2025 MULTISERVICIOS S.A. - Todos los derechos reservados</p>
+          <footer className="bg-[#bab78c] text-gray-800 text-center py-4 mt-auto">
+            <p>© 2025 Multiproductos S.A. - Todos los derechos reservados</p>
           </footer>
         </div>
       </body>

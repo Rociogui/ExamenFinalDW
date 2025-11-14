@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { API_BASE_A, fetchAPI } from "@/lib/api";
-import { PRODUCTOS_CATALOGO } from "@/lib/productos";
+import { PRODUCTOS_CATALOGO, obtenerNombreCompleto, formatearPrecio } from "@/lib/productos";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 interface Cliente {
   id: number;
@@ -21,7 +22,9 @@ interface Pedido {
   id: number;
   descripcion: string;
   total: number;
-  clienteId: number;
+  cliente?: Cliente;
+  clienteId?: number;
+  cliente_id?: number;
   productos?: Producto[];
 }
 
@@ -39,6 +42,34 @@ export default function PedidosPage() {
     productos: [{ nombre: "", precio: 0, cantidad: 1 }],
   });
 
+  // Función para formatear precio con comas
+  const formatearPrecioLocal = (precio: number): string => {
+    return precio.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  };
+
+  // Función para formatear ID de pedido como "P001", "P002", etc.
+  const formatPedidoId = (pedidoId: number): string => {
+    // Encontrar la posición del pedido basada en su ID
+    const sortedPedidos = [...pedidos].sort((a, b) => a.id - b.id);
+    const index = sortedPedidos.findIndex(p => p.id === pedidoId);
+    return "P" + String(index + 1).padStart(3, "0");
+  };
+
+  // Función para formatear ID de cliente como "001", "002", etc.
+  const formatClienteId = (clienteId: number | undefined): string => {
+    if (!clienteId || clienteId === 0) return "—";
+    const index = clientes.findIndex(c => c.id === clienteId);
+    if (index === -1) return "—";
+    return String(index + 1).padStart(3, "0");
+  };
+
+  // Función para obtener el nombre del cliente
+  const getClienteNombre = (clienteId: number | undefined): string => {
+    if (!clienteId) return "—";
+    const cliente = clientes.find(c => c.id === clienteId);
+    return cliente?.nombre || "—";
+  };
+
   useEffect(() => {
     cargarDatos();
   }, []);
@@ -50,8 +81,24 @@ export default function PedidosPage() {
         fetchAPI(`${API_BASE_A}/clientes`),
         fetchAPI(`${API_BASE_A}/pedidos`),
       ]);
-      setClientes(clientesData);
-      setPedidos(pedidosData);
+      const clientesOrdenados = clientesData.sort((a: Cliente, b: Cliente) => a.id - b.id);
+      setClientes(clientesOrdenados);
+      
+      // Enriquecer pedidos con información del cliente
+      const pedidosEnriquecidos = pedidosData.map((pedido: any) => ({
+        ...pedido,
+        // Asegurar que tenemos el ID del cliente de cualquier forma que venga
+        clienteId: pedido.cliente?.id || pedido.clienteId || pedido.cliente_id,
+        // Si no tenemos la información del cliente, intentar obtenerla
+        cliente: pedido.cliente || (
+          clientesOrdenados.find((c: Cliente) => 
+            c.id === (pedido.cliente?.id || pedido.clienteId || pedido.cliente_id)
+          )
+        )
+      }));
+      
+      const pedidosOrdenados = pedidosEnriquecidos.sort((a: Pedido, b: Pedido) => a.id - b.id);
+      setPedidos(pedidosOrdenados);
       setError("");
     } catch (err) {
       setError("Error al cargar datos");
@@ -98,7 +145,6 @@ export default function PedidosPage() {
         return;
       }
 
-      // Validar que haya al menos un producto seleccionado
       const productosValidos = formData.productos.filter((p) => p.nombre && p.precio > 0 && p.cantidad > 0);
       
       if (productosValidos.length === 0) {
@@ -110,8 +156,6 @@ export default function PedidosPage() {
         clienteId: formData.clienteId,
         productos: productosValidos,
       };
-
-      console.log("Enviando payload:", JSON.stringify(payload, null, 2));
 
       const response = await fetchAPI(`${API_BASE_A}/pedidos`, {
         method: "POST",
@@ -130,6 +174,22 @@ export default function PedidosPage() {
     }
   };
 
+  const eliminarPedido = async (id: number) => {
+    if (!window.confirm("¿Estás seguro de que deseas eliminar este pedido?")) {
+      return;
+    }
+    try {
+      await fetchAPI(`${API_BASE_A}/pedidos/${id}`, {
+        method: "DELETE",
+      });
+      setPedidos(pedidos.filter((p) => p.id !== id));
+      setError("");
+    } catch (err) {
+      setError("Error al eliminar pedido");
+      console.error(err);
+    }
+  };
+
   const calcularTotal = (productos: Producto[]) => {
     return productos.reduce((sum, p) => sum + (p.precio * p.cantidad || 0), 0);
   };
@@ -140,7 +200,7 @@ export default function PedidosPage() {
         <h1 className="text-3xl font-bold text-gray-900">Gestión de Pedidos</h1>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition font-medium"
+          className="bg-[#7a9b76] text-white px-6 py-2 rounded-lg hover:bg-[#6a8b66] transition font-medium"
         >
           + Nuevo Pedido
         </button>
@@ -174,12 +234,12 @@ export default function PedidosPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Productos del Catálogo</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Productos</label>
               <div className="space-y-3">
                 {formData.productos.map((producto, index) => (
                   <div key={index} className="flex gap-2 items-end">
                     <div className="flex-1">
-                      <label className="block text-xs text-gray-600 mb-1">Producto</label>
+                      <label className="block text-xs text-gray-600 mb-1">Marca</label>
                       <select
                         value={producto.nombre}
                         onChange={(e) => handleProductoChange(index, "nombre", e.target.value)}
@@ -188,7 +248,7 @@ export default function PedidosPage() {
                         <option value="">Seleccionar producto...</option>
                         {PRODUCTOS_CATALOGO.map((prod) => (
                           <option key={prod.id} value={prod.nombre}>
-                            {prod.nombre} - Q.{prod.precio.toFixed(2)}
+                            {obtenerNombreCompleto(prod)}
                           </option>
                         ))}
                       </select>
@@ -196,7 +256,7 @@ export default function PedidosPage() {
                     <div className="w-32">
                       <label className="block text-xs text-gray-600 mb-1">Precio Unidad</label>
                       <div className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg text-gray-900 bg-gray-100 text-sm font-medium">
-                        Q.{producto.precio.toFixed(2)}
+                        Q.{formatearPrecioLocal(producto.precio)}
                       </div>
                     </div>
                     <div className="w-24">
@@ -211,8 +271,8 @@ export default function PedidosPage() {
                     </div>
                     <div className="w-28">
                       <label className="block text-xs text-gray-600 mb-1">Subtotal</label>
-                      <div className="px-4 py-2 border-2 border-gray-300 rounded-lg bg-blue-50 text-blue-700 font-semibold text-sm">
-                        Q.{(producto.precio * producto.cantidad).toFixed(2)}
+                      <div className="px-4 py-2 border-2 border-gray-300 rounded-lg bg-[#ecdfcd] text-[#604a33] font-semibold text-sm">
+                        Q.{formatearPrecioLocal(producto.precio * producto.cantidad)}
                       </div>
                     </div>
                     {formData.productos.length > 1 && (
@@ -236,16 +296,16 @@ export default function PedidosPage() {
               </button>
             </div>
 
-            <div className="bg-blue-50 p-4 rounded-lg border-2 border-blue-200">
+            <div className="bg-[#ecdfcd] p-4 rounded-lg border-2 border-[#604a33]">
               <p className="text-sm font-medium text-gray-700">
-                Total Estimado: <span className="text-lg font-bold text-blue-600">Q.{calcularTotal(formData.productos).toFixed(2)}</span>
+                Total Estimado: <span className="text-lg font-bold text-[#604a33]">Q.{formatearPrecioLocal(calcularTotal(formData.productos))}</span>
               </p>
             </div>
 
             <div className="flex gap-2">
               <button
                 type="submit"
-                className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition font-medium"
+                className="bg-[#7a9b76] text-white px-6 py-2 rounded-lg hover:bg-[#6a8b66] transition font-medium"
               >
                 Guardar Pedido
               </button>
@@ -274,25 +334,43 @@ export default function PedidosPage() {
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Descripción</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Cliente ID</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Total</th>
+                <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">Acciones</th>
               </tr>
             </thead>
             <tbody>
               {pedidos.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
                     No hay pedidos registrados
                   </td>
                 </tr>
               ) : (
                 pedidos.map((pedido) => (
                   <tr key={pedido.id} className="border-b hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm text-gray-700 font-semibold">{pedido.id}</td>
+                    <td className="px-6 py-4 text-sm text-gray-700 font-mono font-semibold">{formatPedidoId(pedido.id)}</td>
                     <td className="px-6 py-4 text-sm text-gray-700">{pedido.descripcion || "—"}</td>
                     <td className="px-6 py-4 text-sm text-gray-700 font-medium">
-                      {pedido.clienteId || "—"}
+                      {formatClienteId(pedido.clienteId)}
                     </td>
-                    <td className="px-6 py-4 text-sm font-bold text-green-600">
-                      Q.{(pedido.total || 0).toFixed(2)}
+                    <td className="px-6 py-4 text-sm font-bold text-blue-700">
+                      Q.{formatearPrecioLocal(pedido.total || 0)}
+                    </td>
+                    <td className="px-6 py-4 text-sm">
+                      <div className="flex justify-center items-center gap-6">
+                        <Link
+                          href={`/pedidos/info/${pedido.id}`}
+                          className="text-amber-700 hover:text-amber-900 font-medium"
+                        >
+                          Detalle
+                        </Link>
+                        <button
+                          onClick={() => eliminarPedido(pedido.id)}
+                          className="text-gray-950 hover:scale-110 transition text-2xl font-bold"
+                          title="Eliminar pedido"
+                        >
+                          🗑
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))

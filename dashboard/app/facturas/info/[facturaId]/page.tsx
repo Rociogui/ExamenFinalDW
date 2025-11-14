@@ -103,8 +103,8 @@ export default function FacturaDetailPage() {
     <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-lg">
         {/* Header */}
-        <div className="text-center mb-8 border-b-2 border-blue-600 pb-4">
-          <h1 className="text-3xl font-bold text-blue-600 mb-2">FACTURA</h1>
+        <div className="text-center mb-8 border-b-2 border-amber-700 pb-4">
+          <h1 className="text-3xl font-bold text-amber-700 mb-2">FACTURA</h1>
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
               <p className="text-gray-600 font-semibold">Nº FACTURA</p>
@@ -119,8 +119,8 @@ export default function FacturaDetailPage() {
 
         {/* Proveedor Info */}
         {proveedor && (
-          <div className="mb-8 p-4 bg-blue-50 rounded border-l-4 border-blue-600">
-            <h2 className="text-lg font-bold text-blue-600 mb-3">PROVEEDOR</h2>
+          <div className="mb-8 p-4 bg-white rounded border-l-4 border-amber-700">
+            <h2 className="text-lg font-bold text-amber-700 mb-3">PROVEEDOR</h2>
             <div className="space-y-2 text-sm">
               <div className="grid grid-cols-2">
                 <span className="font-semibold text-gray-700">NOMBRE</span>
@@ -143,7 +143,7 @@ export default function FacturaDetailPage() {
         )}
 
         {/* Resumen Financiero */}
-        <div className="mb-8 p-6 bg-purple-50 rounded border-l-4 border-purple-600 space-y-3">
+        <div className="mb-8 p-6 bg-white rounded border-l-4 border-[#879281] space-y-3">
           <div className="grid grid-cols-2 gap-4">
             <div>
               <p className="text-gray-600 font-semibold">SUBTOTAL</p>
@@ -158,9 +158,9 @@ export default function FacturaDetailPage() {
               </p>
             </div>
           </div>
-          <div className="border-t-2 border-purple-300 pt-3">
+          <div className="border-t-2 border-[#879281] pt-3">
             <p className="text-gray-600 font-semibold">TOTAL FACTURA</p>
-            <p className="text-purple-600 font-bold text-2xl">
+            <p className="text-[#879281] font-bold text-2xl">
               Q.{formatearPrecio(calcularTotal())}
             </p>
           </div>
@@ -170,7 +170,7 @@ export default function FacturaDetailPage() {
         <div className="flex gap-4 justify-center">
           <Link
             href="/facturas"
-            className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition font-medium"
+            className="bg-[#879281] text-white px-6 py-2 rounded-lg hover:bg-[#6f7869] transition font-medium"
           >
             Volver a Facturas
           </Link>
