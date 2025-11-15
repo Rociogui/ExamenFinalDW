@@ -15,9 +15,9 @@ public class MetodosCompartidos {
         return precios.stream().mapToDouble(Double::doubleValue).sum();
     }
 
-    // Método para calcular total con IVA (21% por defecto)
+    // Método para calcular total con IVA (12% por defecto)
     public static double calcularTotalConIVA(double subtotal) {
-        return calcularTotalConIVA(subtotal, 0.21);
+        return calcularTotalConIVA(subtotal, 0.12);
     }
 
     // Método para calcular total con IVA personalizado
@@ -32,7 +32,7 @@ public class MetodosCompartidos {
 
     // Método para calcular total con IVA y descuento
     public static double calcularTotalConIVAyDescuento(double subtotal, double porcentajeDescuento) {
-        return calcularTotalConIVAyDescuento(subtotal, porcentajeDescuento, 0.21);
+        return calcularTotalConIVAyDescuento(subtotal, porcentajeDescuento, 0.12);
     }
 
     // Método para calcular total con IVA personalizado y descuento
